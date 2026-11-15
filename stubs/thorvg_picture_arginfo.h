@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 459c1d7b57e13f5d3627f5d4a33f873f44c32f5d */
+ * Stub hash: f6e764bfd74e15f7f3425e48aca0f28513428068 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tvg_picture_new, 0, 0, Tvg_Paint, 1)
 ZEND_END_ARG_INFO()
@@ -16,6 +16,13 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tvg_picture_load_raw, 0, 6, IS_L
 	ZEND_ARG_TYPE_INFO(0, h, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, cs, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, copy, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tvg_picture_load_alpha, 0, 4, IS_LONG, 0)
+	ZEND_ARG_OBJ_INFO(0, picture, Tvg_Paint, 0)
+	ZEND_ARG_TYPE_INFO(0, alpha, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, w, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, h, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tvg_picture_load_data, 0, 6, IS_LONG, 0)
@@ -249,6 +256,7 @@ ZEND_END_ARG_INFO()
 ZEND_FUNCTION(tvg_picture_new);
 ZEND_FUNCTION(tvg_picture_load);
 ZEND_FUNCTION(tvg_picture_load_raw);
+ZEND_FUNCTION(tvg_picture_load_alpha);
 ZEND_FUNCTION(tvg_picture_load_data);
 ZEND_FUNCTION(tvg_picture_set_asset_resolver);
 ZEND_FUNCTION(tvg_picture_set_size);
@@ -292,6 +300,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(tvg_picture_new, arginfo_tvg_picture_new)
 	ZEND_FE(tvg_picture_load, arginfo_tvg_picture_load)
 	ZEND_FE(tvg_picture_load_raw, arginfo_tvg_picture_load_raw)
+	ZEND_FE(tvg_picture_load_alpha, arginfo_tvg_picture_load_alpha)
 	ZEND_FE(tvg_picture_load_data, arginfo_tvg_picture_load_data)
 	ZEND_FE(tvg_picture_set_asset_resolver, arginfo_tvg_picture_set_asset_resolver)
 	ZEND_FE(tvg_picture_set_size, arginfo_tvg_picture_set_size)

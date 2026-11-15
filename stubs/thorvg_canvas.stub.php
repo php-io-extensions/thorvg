@@ -19,6 +19,13 @@ function tvg_swcanvas_set_target(Tvg_Canvas $canvas, string|int $buffer, int $st
  */
 function tvg_swcanvas_get_alpha(string|int $buffer, int $stride, int $w, int $h, int $cs): string {}
 
+/**
+ * Binding addition: the address of the string a software canvas draws into, as kept by
+ * tvg_swcanvas_set_target(); 0 when its target was given as an address, or none is set.
+ * Valid until the target is replaced or the canvas is freed.
+ */
+function tvg_swcanvas_get_target_address(Tvg_Canvas $canvas): int {}
+
 function tvg_glcanvas_create(int $op): ?Tvg_Canvas {}
 
 function tvg_glcanvas_set_target(Tvg_Canvas $canvas, int $display, int $surface, int $context, int $id, int $w, int $h, int $cs): int {}

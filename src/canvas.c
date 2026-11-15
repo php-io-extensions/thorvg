@@ -109,6 +109,25 @@ ZEND_FUNCTION(tvg_swcanvas_set_target)
 }
 
 /* Binding addition: the alpha byte (bits 24..31 of each word) of a 32-bit canvas buffer, rows packed. */
+ZEND_FUNCTION(tvg_swcanvas_get_target_address)
+{
+	zval *canvas_zv;
+	tvg_handle_obj *handle;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(canvas_zv, tvg_handle_ce[TVG_K_CANVAS])
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (tvg_canvas_arg(canvas_zv, 1) == NULL) {
+		RETURN_THROWS();
+	}
+	handle = tvg_handle_from(Z_OBJ_P(canvas_zv));
+	if (Z_TYPE(handle->keep) != IS_STRING) {
+		RETURN_LONG(0);
+	}
+	RETURN_LONG((zend_long) (uintptr_t) Z_STRVAL(handle->keep));
+}
+
 ZEND_FUNCTION(tvg_swcanvas_get_alpha)
 {
 	zend_string *buffer = NULL, *alpha;

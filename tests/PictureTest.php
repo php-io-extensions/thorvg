@@ -129,3 +129,20 @@ it('refuses a path that is not valid UTF-8 (the macOS media loader would abort o
     expect(fn () => tvg_picture_load(tvg_picture_new(), "\xff.svg"))->toThrow(ValueError::class, 'valid UTF-8')
         ->and(fn () => tvg_font_load("\xff.ttf"))->toThrow(ValueError::class, 'valid UTF-8');
 });
+
+it('loads an A8 mask as a picture of black at each alpha', function () {
+    tvg_engine_init(0);
+    $p = tvg_picture_new();
+    expect(tvg_picture_load_alpha($p, "\x00\x80\xff\x40", 2, 2))->toBe(TVG_RESULT_SUCCESS);
+    $w = $h = 0.0;
+    tvg_picture_get_size($p, $w, $h);
+    expect([$w, $h])->toBe([2.0, 2.0]);
+    $buf = str_repeat("\0", 16);
+    $c = tvg_swcanvas_create(TVG_ENGINE_OPTION_NONE);
+    tvg_swcanvas_set_target($c, $buf, 2, 2, 2, TVG_COLORSPACE_ARGB8888);
+    tvg_canvas_add($c, $p);
+    tvg_canvas_update($c); tvg_canvas_draw($c, true); tvg_canvas_sync($c);
+    expect(tvg_swcanvas_get_alpha($buf, 2, 2, 2, TVG_COLORSPACE_ARGB8888))->toBe("\x00\x80\xff\x40");
+    expect(fn () => tvg_picture_load_alpha(tvg_picture_new(), "\0", 2, 2))->toThrow(ValueError::class);
+    tvg_canvas_destroy($c);
+});

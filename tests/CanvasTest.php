@@ -106,3 +106,27 @@ it('reads a canvas buffer\'s alpha bytes in one call (binding addition)', functi
         ->and(fn () => tvg_swcanvas_get_alpha($buffer, 4, 3, 2, TVG_COLORSPACE_GRAYSCALE8))->toThrow(ValueError::class)
         ->and(fn () => tvg_swcanvas_get_alpha(0, 4, 3, 2, TVG_COLORSPACE_ARGB8888))->toThrow(ValueError::class);
 });
+
+it('answers the address of the string a canvas draws into', function () {
+    $canvas = tvg_swcanvas_create(TVG_ENGINE_OPTION_NONE);
+    expect(tvg_swcanvas_get_target_address($canvas))->toBe(0);
+
+    $buffer = str_repeat("\0", 4 * 4 * 4);
+    tvg_swcanvas_set_target($canvas, $buffer, 4, 4, 4, TVG_COLORSPACE_ABGR8888S);
+    $address = tvg_swcanvas_get_target_address($canvas);
+    expect($address)->toBeGreaterThan(0);
+
+    // a second canvas drawing at that address writes into the first one's string
+    $other = tvg_swcanvas_create(TVG_ENGINE_OPTION_NONE);
+    tvg_swcanvas_set_target($other, $address, 4, 4, 4, TVG_COLORSPACE_ABGR8888S);
+    expect(tvg_swcanvas_get_target_address($other))->toBe(0);
+    $rect = tvg_shape_new();
+    tvg_shape_append_rect($rect, 0.0, 0.0, 4.0, 4.0, 0.0, 0.0, true);
+    tvg_shape_set_fill_color($rect, 1, 2, 3, 255);
+    tvg_canvas_add($other, $rect);
+    tvg_canvas_update($other);
+    tvg_canvas_draw($other, false);
+    tvg_canvas_sync($other);
+
+    expect(substr($buffer, 0, 4))->toBe("\x01\x02\x03\xFF");
+});

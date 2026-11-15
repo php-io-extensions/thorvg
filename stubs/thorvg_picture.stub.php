@@ -9,6 +9,9 @@ function tvg_picture_load(Tvg_Paint $picture, string $path): int {}
 /** $data: a string of at least $w × $h × 4 bytes or an address, trusted. Without $copy, a string is kept alive until the request ends. */
 function tvg_picture_load_raw(Tvg_Paint $picture, string|int $data, int $w, int $h, int $cs, bool $copy): int {}
 
+/** Binding addition, the counterpart of tvg_swcanvas_get_alpha: each byte c of $alpha (w * h) loaded as the ARGB8888 pixel 0xCC000000 (ThorVG copies it), for an alpha mask. */
+function tvg_picture_load_alpha(Tvg_Paint $picture, string $alpha, int $w, int $h): int {}
+
 /** $data: a string of at least $size bytes or an address, trusted. Without $copy, a string is kept alive until the request ends. */
 function tvg_picture_load_data(Tvg_Paint $picture, string|int $data, int $size, ?string $mimetype, ?string $rpath, bool $copy): int {}
 

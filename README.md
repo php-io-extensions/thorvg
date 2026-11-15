@@ -110,7 +110,7 @@ ThorVG modules => cpu engine, svg, png, jpg, webp, ttf, otf, media, gif saver
 
 ## API
 
-All 190 functions of ThorVG's C API, under their C names, plus one binding addition: `tvg_swcanvas_get_alpha()` returns the alpha byte of every pixel of a 32-bit canvas buffer in one call (a shape drawn in opaque white on a cleared buffer leaves its coverage there). The full rules are in the [design spec](docs/superpowers/specs/2026-11-13-thorvg-design.md).
+All 190 functions of ThorVG's C API, under their C names, plus two binding additions: `tvg_swcanvas_get_alpha()` returns the alpha byte of every pixel of a 32-bit canvas buffer in one call (a shape drawn in opaque white on a cleared buffer leaves its coverage there), and `tvg_swcanvas_get_target_address()` returns the address of the string a canvas draws into, so other code can draw into the same memory. The full rules are in the [design spec](docs/superpowers/specs/2026-11-13-thorvg-design.md).
 
 ### What is compiled in
 

@@ -4,6 +4,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
+#include <inttypes.h>
 #include "config.h"
 #endif
 
@@ -90,6 +91,47 @@ ZEND_FUNCTION(tvg_picture_load_raw)
 	if (result == TVG_RESULT_SUCCESS && !copy && data != NULL) {
 		tvg_borrow(data);
 	}
+	RETURN_LONG((zend_long) result);
+}
+
+/*
+ * Binding addition, the counterpart of tvg_swcanvas_get_alpha(): one coverage byte per pixel loaded
+ * as a raw ARGB8888 picture of 0xCC000000 words (black at alpha c), copied by ThorVG. An A8 mask
+ * becomes an alpha-mask picture in C rather than by widening every byte in PHP.
+ */
+ZEND_FUNCTION(tvg_picture_load_alpha)
+{
+	zval *picture_zv;
+	zend_string *alpha;
+	zend_long w, h;
+	Tvg_Paint picture;
+
+	ZEND_PARSE_PARAMETERS_START(4, 4)
+		Z_PARAM_OBJECT_OF_CLASS(picture_zv, PAINT_CE)
+		Z_PARAM_STR(alpha)
+		Z_PARAM_LONG(w)
+		Z_PARAM_LONG(h)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (!tvg_u32(w, 3) || !tvg_u32(h, 4)) {
+		RETURN_THROWS();
+	}
+	if ((uint64_t) w * (uint64_t) h != ZSTR_LEN(alpha)) {
+		zend_argument_value_error(2, "must hold w * h bytes (%" PRIu64 "), %zu given", (uint64_t) w * (uint64_t) h, ZSTR_LEN(alpha));
+		RETURN_THROWS();
+	}
+	picture = tvg_paint_arg(picture_zv, TVG_TYPE_PICTURE, 1);
+	if (picture == NULL) {
+		RETURN_THROWS();
+	}
+	size_t n = ZSTR_LEN(alpha);
+	uint32_t *words = safe_emalloc(n ? n : 1, sizeof(uint32_t), 0);
+	const unsigned char *in = (const unsigned char *) ZSTR_VAL(alpha);
+	for (size_t i = 0; i < n; i++) {
+		words[i] = (uint32_t) in[i] << 24;
+	}
+	Tvg_Result result = tvg_picture_load_raw(picture, words, (uint32_t) w, (uint32_t) h, TVG_COLORSPACE_ARGB8888, true);
+	efree(words);
 	RETURN_LONG((zend_long) result);
 }
 
