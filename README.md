@@ -110,7 +110,7 @@ ThorVG modules => cpu engine, svg, png, jpg, webp, ttf, otf, media, gif saver
 
 ## API
 
-All 190 functions of ThorVG's C API, under their C names, plus two binding additions: `tvg_swcanvas_get_alpha()` returns the alpha byte of every pixel of a 32-bit canvas buffer in one call (a shape drawn in opaque white on a cleared buffer leaves its coverage there), and `tvg_swcanvas_get_target_address()` returns the address of the string a canvas draws into, so other code can draw into the same memory. The full rules are in the [design spec](docs/superpowers/specs/2026-11-13-thorvg-design.md).
+All 190 functions of ThorVG's C API, under their C names, plus two binding additions: `tvg_swcanvas_get_alpha()` returns the alpha byte of every pixel of a 32-bit canvas buffer in one call (a shape drawn in opaque white on a cleared buffer leaves its coverage there), and `tvg_swcanvas_get_target_address()` returns the address of the string a canvas draws into, so other code can draw into the same memory. A third, `tvg_shape_get_stroke_outline()`, returns the outline of a shape's stroke from ThorVG's own CPU stroker, in the shape's own coordinates and in the same form as `tvg_shape_get_path()` (width, cap, join and miter limit applied; dash and trim not). ThorVG's API keeps a stroke as settings only, so this one calls ThorVG internals (`cpu_engine/tvgSwStroke.cpp`) and a ThorVG update may change it. The full rules are in the [design spec](docs/superpowers/specs/2026-11-13-thorvg-design.md).
 
 ### What is compiled in
 

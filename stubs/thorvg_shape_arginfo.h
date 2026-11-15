@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 240fdbbe1aea582b7db04277d47da44097cbdbc0 */
+ * Stub hash: bb2e6b176912d1631fd640fdbcb9699f14de7ce3 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tvg_shape_new, 0, 0, Tvg_Paint, 1)
 ZEND_END_ARG_INFO()
@@ -63,6 +63,8 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tvg_shape_get_path, 0, 5, IS_LON
 	ZEND_ARG_TYPE_INFO(1, pts, IS_ARRAY, 1)
 	ZEND_ARG_TYPE_INFO(1, ptsCnt, IS_LONG, 1)
 ZEND_END_ARG_INFO()
+
+#define arginfo_tvg_shape_get_stroke_outline arginfo_tvg_shape_get_path
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tvg_shape_set_stroke_width, 0, 2, IS_LONG, 0)
 	ZEND_ARG_OBJ_INFO(0, paint, Tvg_Paint, 0)
@@ -184,6 +186,7 @@ ZEND_FUNCTION(tvg_shape_append_rect);
 ZEND_FUNCTION(tvg_shape_append_circle);
 ZEND_FUNCTION(tvg_shape_append_path);
 ZEND_FUNCTION(tvg_shape_get_path);
+ZEND_FUNCTION(tvg_shape_get_stroke_outline);
 ZEND_FUNCTION(tvg_shape_set_stroke_width);
 ZEND_FUNCTION(tvg_shape_get_stroke_width);
 ZEND_FUNCTION(tvg_shape_set_stroke_color);
@@ -218,6 +221,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(tvg_shape_append_circle, arginfo_tvg_shape_append_circle)
 	ZEND_FE(tvg_shape_append_path, arginfo_tvg_shape_append_path)
 	ZEND_FE(tvg_shape_get_path, arginfo_tvg_shape_get_path)
+	ZEND_FE(tvg_shape_get_stroke_outline, arginfo_tvg_shape_get_stroke_outline)
 	ZEND_FE(tvg_shape_set_stroke_width, arginfo_tvg_shape_set_stroke_width)
 	ZEND_FE(tvg_shape_get_stroke_width, arginfo_tvg_shape_get_stroke_width)
 	ZEND_FE(tvg_shape_set_stroke_color, arginfo_tvg_shape_set_stroke_color)

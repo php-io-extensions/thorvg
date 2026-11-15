@@ -97,3 +97,63 @@ it('refuses NaN and infinite path geometry, on which ThorVG\'s stroker never fin
         ->and(fn () => tvg_shape_append_path($shape, [TVG_PATH_COMMAND_MOVE_TO], 1, [new Tvg_Point(NAN, 0)], 1))->toThrow(ValueError::class, 'finite points')
         ->and(tvg_shape_move_to($shape, 1e30, -1e30))->toBe(TVG_RESULT_SUCCESS);
 });
+
+/** [x, y] pairs of a Tvg_Point list, rounded to a thousandth. */
+function strokePoints(array $points): array
+{
+    return array_map(fn (Tvg_Point $p): array => [round($p->x, 3) + 0.0, round($p->y, 3) + 0.0], $points);
+}
+
+it('gives the outline of a stroke from ThorVG\'s own stroker, in the shape\'s own coordinates', function (): void {
+    $shape = tvg_shape_new();
+    tvg_shape_move_to($shape, 10, 10);
+    tvg_shape_line_to($shape, 50, 10);
+    tvg_shape_set_stroke_width($shape, 8.0);
+    tvg_shape_set_stroke_cap($shape, TVG_STROKE_CAP_BUTT);
+
+    expect(tvg_shape_get_stroke_outline($shape, $cmds, $cmdCount, $points, $pointCount))->toBe(TVG_RESULT_SUCCESS)
+        ->and($cmds[0])->toBe(TVG_PATH_COMMAND_MOVE_TO)
+        ->and(end($cmds))->toBe(TVG_PATH_COMMAND_CLOSE)
+        ->and($cmdCount)->toBe(count($cmds))
+        ->and($pointCount)->toBe(count($points))
+        // a butt-capped band 8 wide: the rectangle (10, 6)–(50, 14)
+        ->and(array_values(array_unique(strokePoints($points), SORT_REGULAR)))->toEqualCanonicalizing([[10.0, 14.0], [50.0, 14.0], [50.0, 6.0], [10.0, 6.0]])
+        // the path itself is untouched
+        ->and(tvg_shape_get_path($shape, $own, $ownCount, $ownPoints, $ownPointCount))->toBe(TVG_RESULT_SUCCESS)
+        ->and(strokePoints($ownPoints))->toBe([[10.0, 10.0], [50.0, 10.0]]);
+});
+
+it('follows the shape\'s cap and join: square caps reach past the ends, a miter join meets at the corner', function (): void {
+    $square = tvg_shape_new();
+    tvg_shape_move_to($square, 10, 10);
+    tvg_shape_line_to($square, 50, 10);
+    tvg_shape_set_stroke_width($square, 8.0);
+    tvg_shape_set_stroke_cap($square, TVG_STROKE_CAP_SQUARE);
+    tvg_shape_get_stroke_outline($square, $cmds, $count, $points, $pointCount);
+    $xs = array_column(strokePoints($points), 0);
+
+    $corner = tvg_shape_new();
+    tvg_shape_move_to($corner, 0, 0);
+    tvg_shape_line_to($corner, 40, 0);
+    tvg_shape_line_to($corner, 40, 40);
+    tvg_shape_set_stroke_width($corner, 10.0);
+    tvg_shape_set_stroke_cap($corner, TVG_STROKE_CAP_BUTT);
+    tvg_shape_set_stroke_join($corner, TVG_STROKE_JOIN_MITER);
+    tvg_shape_get_stroke_outline($corner, $c, $n, $cornerPoints, $m);
+
+    expect([min($xs), max($xs)])->toBe([6.0, 54.0])
+        ->and(strokePoints($cornerPoints))->toContain([45.0, -5.0]);
+});
+
+it('gives an empty outline for a shape with no stroke width', function (): void {
+    $shape = tvg_shape_new();
+    tvg_shape_move_to($shape, 0, 0);
+    tvg_shape_line_to($shape, 5, 5);
+
+    expect(tvg_shape_get_stroke_outline($shape, $cmds, $count, $points, $pointCount))->toBe(TVG_RESULT_SUCCESS)
+        ->and([$cmds, $count, $points, $pointCount])->toBe([[], 0, [], 0]);
+});
+
+it('refuses a stroke outline for a paint that is not a shape', function (): void {
+    expect(fn () => tvg_shape_get_stroke_outline(tvg_scene_new(), $c, $n, $p, $m))->toThrow(TypeError::class);
+});

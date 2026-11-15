@@ -145,6 +145,8 @@ EOF
   if test -n "$THORVG_SIMD_SRC"; then
     thorvg_rule "$THORVG_SIMD_SRC" "$THORVG_SIMD_FLAGS"
   fi
+  dnl The binding's own C++: it reads ThorVG internals, so it is built as ThorVG is.
+  thorvg_rule "src/stroke_outline.cpp" ""
   for thorvg_src in $THORVG_MM; do
     PHP_ADD_BUILD_DIR([$ext_builddir/$(dirname $thorvg_src)])
     thorvg_rule "$thorvg_src" "-x objective-c++ -fno-objc-arc"

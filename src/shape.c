@@ -292,6 +292,54 @@ ZEND_FUNCTION(tvg_shape_get_path)
 	RETURN_LONG((zend_long) result);
 }
 
+extern int tvgphp_stroke_outline(const void *paint, uint8_t **cmds, uint32_t *cmd_cnt, float **xy, uint32_t *pt_cnt);
+
+/* Binding addition: see src/stroke_outline.cpp. */
+ZEND_FUNCTION(tvg_shape_get_stroke_outline)
+{
+	zval *paint_zv, *cmds_zv, *cmds_cnt_zv, *pts_zv, *pts_cnt_zv, cmds_list, pts_list;
+	Tvg_Paint paint;
+	uint8_t *cmds;
+	float *xy;
+	uint32_t cmds_cnt, pts_cnt, i;
+	int result;
+
+	ZEND_PARSE_PARAMETERS_START(5, 5)
+		Z_PARAM_OBJECT_OF_CLASS(paint_zv, PAINT_CE)
+		Z_PARAM_ZVAL(cmds_zv)
+		Z_PARAM_ZVAL(cmds_cnt_zv)
+		Z_PARAM_ZVAL(pts_zv)
+		Z_PARAM_ZVAL(pts_cnt_zv)
+	ZEND_PARSE_PARAMETERS_END();
+
+	paint = tvg_paint_arg(paint_zv, TVG_TYPE_SHAPE, 1);
+	if (paint == NULL) {
+		RETURN_THROWS();
+	}
+	result = tvgphp_stroke_outline(paint, &cmds, &cmds_cnt, &xy, &pts_cnt);
+	array_init_size(&cmds_list, cmds_cnt);
+	for (i = 0; i < cmds_cnt; i++) {
+		add_next_index_long(&cmds_list, (zend_long) cmds[i]);
+	}
+	array_init_size(&pts_list, pts_cnt);
+	for (i = 0; i < pts_cnt; i++) {
+		zval point;
+		Tvg_Point p = { xy[2 * i], xy[2 * i + 1] };
+		tvg_point_new(&p, &point);
+		zend_hash_next_index_insert_new(Z_ARRVAL(pts_list), &point);
+	}
+	free(cmds);
+	free(xy);
+	ZEND_TRY_ASSIGN_REF_VALUE(cmds_zv, &cmds_list);
+	TVG_REF_LONG(cmds_cnt_zv, cmds_cnt);
+	ZEND_TRY_ASSIGN_REF_VALUE(pts_zv, &pts_list);
+	TVG_REF_LONG(pts_cnt_zv, pts_cnt);
+	if (EG(exception)) {
+		RETURN_THROWS();
+	}
+	RETURN_LONG((zend_long) result);
+}
+
 ZEND_FUNCTION(tvg_shape_set_stroke_width)
 {
 	zval *paint_zv;
